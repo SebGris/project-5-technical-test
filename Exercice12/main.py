@@ -7,38 +7,28 @@ class Book:
 
 class Library:
     def __init__(self):
-        self.books = []
-        self.borrow_books = []
+        self.books = {}  # Dictionnaire pour stocker les livres et leur statut (True = disponible, False = emprunté)
 
-    # Ajouter les méthodes ici
     def add_book(self, book):
-        self.books.append(book)
+        self.books[book.title] = {"book": book, "available": True}
 
     def remove_book(self, book_title):
-        for book in self.books:
-            if book.title == book_title:
-                self.books.remove(book)
-                break
+        if book_title in self.books:
+            del self.books[book_title]
 
     def borrow_book(self, book_title):
-        for book in self.books:
-            if book.title == book_title:
-                self.books.remove(book)
-                self.borrow_books.append(book)
-                break
+        if book_title in self.books and self.books[book_title]["available"]:
+            self.books[book_title]["available"] = False
 
     def return_book(self, book_title):
-        for book in self.borrow_books:
-            if book.title == book_title:
-                self.borrow_books.remove(book)
-                self.books.append(book)
-                break
+        if book_title in self.books and not self.books[book_title]["available"]:
+            self.books[book_title]["available"] = True
 
     def available_books(self):
-        return [book.title for book in self.books]
+        return [title for title, info in self.books.items() if info["available"]]
 
     def borrowed_books(self):
-        return [book.title for book in self.borrow_books]
+        return [title for title, info in self.books.items() if not info["available"]]
 
 
 def test():
@@ -53,8 +43,9 @@ def test():
     library.add_book(book1)
     library.add_book(book2)
 
-    # Afficher les livres dans la bibliothèque
-    for book in library.books:
+    # Afficher les livres disponibles dans la bibliothèque
+    for title in library.available_books():
+        book = library.books[title]["book"]
         print(f"{book.title} by {book.author}, published in {book.year}")
 
 
